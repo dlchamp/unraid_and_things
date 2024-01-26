@@ -1,6 +1,4 @@
 #! /bin/bash
-
-start_time=$(date +%s)
 # set the source directory/share.
 source_dir=""
 
@@ -17,13 +15,26 @@ backup_file_name=""
 # as a new backup is created beyond this number, the oldest backup will be deleted.
 max_backups_to_keep=2
 
+# ---------------------------------------------------------------------------------#
+start_time=$(date +%s)
 now=$(date +"%m_%d_%Y-%H_%M")
 echo "Backup script starting: $now"
+
+
 
 if [ -z "$backup_file_name" ]; then
     # use the last part of source_dir as the backup file name if one not set
     backup_file_name=$(basename "$source_dir")
 fi
+
+# Check if backup destiation exists and is writable
+# Ensure backup directory exists and is writable
+if [ ! -d "$backup_dir" ] || [ ! -w "$backup_dir" ]; then
+    echo "Backup directory does not exist or is not writable."
+    /usr/local/emhttp/webGui/scripts/notify -i warning -s "$backup_file_name backup failed. $backup_dir does not exist or is not writable."
+    exit 1
+fi
+
 backup_file="$backup_dir/${backup_file_name}_$now.tar.gz"
 
 # Begin backup
