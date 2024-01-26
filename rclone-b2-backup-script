@@ -1,20 +1,27 @@
 echo "Begin backup of /plex"
-rclone sync /mnt/disks/External/plex/ b2:dlchamp-plex-data --transfers=4 --checkers=16 --fast-list --ignore-existing -P --retries=1 --buffer-size=100M --b2-chunk-size=500M
+rclone sync /mnt/disks/backup/plex/ b2:dlchamp-plex-data --transfers=4 --checkers=8 --fast-list --ignore-existing -P --buffer-size=100M --b2-chunk-size=500M --delete-excluded
 echo "Plex backup complete"
 sleep 1
 
 echo "Begin backup of /cloud"
-rclone sync /mnt/disks/External/cloud/ b2:dlchamp-cloud --transfers=4 --checkers=16 --fast-list --ignore-existing -P --retries=1 --buffer-size=100M --b2-chunk-size=500M
+rclone sync /mnt/disks/backup/cloud/ b2:dlchamp-cloud --transfers=4 --checkers=8 --fast-list --ignore-existing -P --buffer-size=100M --b2-chunk-size=500M --delete-excluded
 echo "Cloud backup is complete."
 sleep 1
 
 echo "Begin backup of /appdata"
-rclone sync /mnt/disks/External/appdata/ b2:dlchamp-appdata --transfers=4 --checkers=16 --fast-list --ignore-existing -P --retries=1 --buffer-size=100M --b2-chunk-size=500M
+rclone sync /mnt/disks/backup/appdata/ b2:dlchamp-appdata --transfers=4 --checkers=8 --fast-list --ignore-existing -P --buffer-size=100M --b2-chunk-size=500M --delete-excluded
 sleep 1 
 
 echo "Begin backup of /usb"
-rclone sync /mnt/disks/External/usb/ b2:dlchamp-usb --transfers=4 --checkers=16 --fast-list --ignore-existing -P --retries=1 --buffer-size=100M --b2-chunk-size=500M
+rclone sync /mnt/disks/backup/usb/ b2:dlchamp-usb --transfers=4 --checkers=8 --fast-list --ignore-existing -P --buffer-size=100M --b2-chunk-size=500M --delete-excluded
 echo "All backups uploaded."
+
+
+
+
+
+
+
 
 
 
