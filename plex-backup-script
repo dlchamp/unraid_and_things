@@ -1,0 +1,73 @@
+#!/bin/bash
+# Add your plex library path  (ie: /mnt/cache/appdata/plex/Library/Application Support/Plex Media Server/)
+plex_library_dir="/mnt/cache/appdata/plex/Library/Application Support/Plex Media Server/" 
+
+# Add your backup destination (ie: '/mnt/disks/external/plex')
+backup_dir=""  
+
+# Set the max number of backups to keep.
+num_backups_to_keep=2
+
+# --------------------------------------------------------------------------------------- #
+start_time=$(date +%s)
+echo "Script start: $(date)"
+
+now=$(date +"%m_%d_%Y-%H_%M") 
+
+# Get the state of the container, assumed your Plex container is called "plex"
+# If it's not, for whatever reason, adjut the command below.
+plex_running=`docker inspect -f '{{.State.Running}}' plex`
+echo "Plex running: $plex_running"
+
+# If container is running, try up to 5 times to stop it.
+fail_counter=0
+while [ "$plex_running" = "true" ];
+do
+    fail_counter=$((fail_counter+1))
+    docker stop plex
+    echo "Stopping Plex attempt #$fail_counter"
+    sleep 30
+    plex_running=`docker inspect -f '{{.State.Running}}' plex`
+    # Exit with an error code if the container won't stop
+    # Restart plex and report a warning to the Unraid GUI
+    if (($fail_counter == 5));
+    then
+        echo "Plex failed to stop. Restarting container and exiting"
+        docker start plex
+        /usr/local/emhttp/webGui/scripts/notify -i warning -s "Plex Backup failed. Failed to stop container for backup."
+        exit 1
+    fi
+done
+
+# Compress and backup Plex Databases
+echo "Compressing and backing up Plex Databases"
+tar -czf "$backup_dir/plex_backup_$now.tar.gz" -C "$plex_library_dir" "Plug-in Support/Databases/com.plexapp.plugins.library.db" "Plug-in Support/Databases/com.plexapp.plugins.library.blobs.db"
+backup_status=$?
+# Start Plex once the compression and backup is complete
+echo "Backup is complete. Starting plex container."
+docker start plex
+echo "Plex has been started."
+
+# Verify backup was successful
+if [ "$backup_status" -ne 0 ]; then  
+    echo "Backup failed. Exiting script."
+    /user/local/emhttp/webGui/scripts/notify -i warning -s "Plex backup failed. See log for details."
+    exit 1
+fi
+
+# clean up old backups
+echo "Checking and removing old backups if necessary."
+num_backups=$(ls "$backup_dir/plex_backup_"*.tar.gz | wc -l)
+
+if [ $num_backups -gt $num_backups_to_keep ]; then
+    oldest_backup=$(ls -t "$backup_dir/plex_backup_"*.tar.gz | tail -1)
+    echo "More than $num_backups_to_keep backups found. Removing oldest backup $oldest_backup."
+    rm "$oldest_backup"
+fi
+
+runtime=$(($(date +%s) - $start_time))
+runtime_converted=$(printf "%d:%02d" $((runtime / 60)) $((runtime % 60)))
+echo "Script runtime: $runtime_converted."
+
+# Notification for script completion
+/usr/local/emhttp/webGui/scripts/notify -i normal -s "Plex Backup completed in $runtime_converted"

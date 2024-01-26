@@ -1,0 +1,2 @@
+#!/bin/bash
+docker exec PhotoPrism photoprism index --cleanup

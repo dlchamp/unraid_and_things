@@ -1,0 +1,54 @@
+#! /bin/bash
+
+start_time=$(date +%s)
+# set the source directory/share.
+source_dir=""
+
+# set the destination directory/backup location
+backup_dir=""
+
+# and add a prefix to the file backup file name, date and time the backup
+# was started will be appended (ex: "Cloud_Backup-2024-01-16_09-55.tar.gz")
+# If not specified, the last part of your source_dir will be used 
+# (example: /mnt/user/cloud, "cloud_{datetime}.tar.gz" will be used)
+backup_file_name=""
+
+# set number of backups you wish to keep
+# as a new backup is created beyond this number, the oldest backup will be deleted.
+max_backups_to_keep=2
+
+now=$(date +"%m_%d_%Y-%H_%M")
+echo "Backup script starting: $now"
+
+if [ -z "$backup_file_name" ]; then
+    # use the last part of source_dir as the backup file name if one not set
+    backup_file_name=$(basename "$source_dir")
+fi
+backup_file="$backup_dir/${backup_file_name}_$now.tar.gz"
+
+# Begin backup
+echo "Starting backup of $source_dir to $backup_file"
+tar -czf "$backup_file" -C "$source_dir" .
+
+# Verify backup was successful
+if [ $? -ne 0 ]; then  
+    echo "Backup failed. Exiting script."
+    /user/local/emhttp/webGui/scripts/notify -i warning -s "$backup_file_name backup failed. See log for details."
+    exit 1
+fi
+
+# clean up old backups
+echo "Checking and removing old backups if necessary."
+num_backups=$(ls "$backup_dir/${backup_file_name}_"*.tar.gz | wc -l)
+
+if [ $num_backups -gt $max_backups_to_keep ]; then
+    oldest_backup=$(ls -t "$backup_dir/${backup_file_name}_"*.tar.gz | tail -1)
+    echo "More than $max_backups_to_keep backups found. Removing oldest backup $oldest_backup."
+    rm "$oldest_backup"
+fi
+
+# Backup completed
+runtime=$(($(date +%s) - $start_time))
+runtime_converted=$(printf "%d:%02d" $((runtime / 60)) $((runtime % 60)))
+echo "Successful backup - $backup_file"
+/usr/local/emhttp/webGui/scripts/notify -i normal -s "$backup_file_name backup complete in $runtime_converted"

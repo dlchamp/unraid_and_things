@@ -1,0 +1,80 @@
+#!/bin/bash
+scriptstart=$(date +'%s')
+LOGFILE="/boot/logs/Daily-Log.txt"
+
+docker restart binhex-qbittorrentvpn
+echo "$(date "+%m-%d-%Y %T") : Restarted Qbittorrent" >> $LOGFILE 2>&1
+
+docker restart radarr
+echo "$(date "+%m-%d-%Y %T") : Restarted radarr" >> $LOGFILE 2>&1
+
+docker restart radarr-4k
+echo "$(date "+%m-%d-%Y %T") : Restarted radarr-4k" >> $LOGFILE 2>&1
+
+docker restart sonarr
+echo "$(date "+%m-%d-%Y %T") : Restarted sonarr" >> $LOGFILE 2>&1
+
+
+#Delete danging docker images
+docker image prune -f
+echo "$(date "+%m-%d-%Y %T") : Cleaned up dangling docker images" >> $LOGFILE 2>&1
+
+#Delete DS Store file types after 7 days, uses a dstore.txt to keep track on every run.
+#read dsStoreRun < /tmp/dstore.txt
+#if ((dsStoreRun == 7)); then
+    #    find /mnt/user -maxdepth 9999 -noleaf -type f -name ".DS_Store" -exec rm "{}" \;
+    #   echo "$(date "+%m-%d-%Y %T") : Deleted .DS_Store Files" >> $LOGFILE 2>&1
+    #  dsStoreRun=0
+#else
+    #    dsStoreRun=$((dsStoreRun + 1))
+#fi
+#echo $dsStoreRun > /tmp/dstore.txt
+
+
+#Create/Cleanup Media lists for data recovery reasons
+# Verify destination exists, create if not
+mkdir -p "/boot/logs/media_list"
+
+#Movies
+find "/mnt/user/plex_media/Movies" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/boot/logs/media_list/Movies $(date +\%Y-\%m-\%d-\%H-\%M).txt"
+echo "$(date "+%m-%d-%Y %T") : Created Movies List" >> $LOGFILE 2>&1
+
+#4K Movies
+find "/mnt/user/plex_media/UHD" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/boot/logs/media_list/UHD $(date +\%Y-\%m-\%d-\%H-\%M).txt"
+echo "$(date "+%m-%d-%Y %T") : Created UHD List" >> $LOGFILE 2>&1
+
+#Comedy
+find "/mnt/user/plex_media/Comedy" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/boot/logs/media_list/Comedy $(date +\%Y-\%m-\%d-\%H-\%M).txt"
+echo "$(date "+%m-%d-%Y %T") : Created Comedy List" >> $LOGFILE 2>&1
+
+#Documentaries
+find "/mnt/user/plex_media/Documentary" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/boot/logs/media_list/docs $(date +\%Y-\%m-\%d-\%H-\%M).txt"
+echo "$(date "+%m-%d-%Y %T") : Created Docs List" >> $LOGFILE 2>&1
+
+#Kids
+find "/mnt/user/plex_media/Kids" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/boot/logs/media_list/Kids $(date +\%Y-\%m-\%d-\%H-\%M).txt"
+echo "$(date "+%m-%d-%Y %T") : Created Kids List" >> $LOGFILE 2>&1
+
+#TVSeries
+find "/mnt/user/plex_media/TV Shows" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/boot/logs/media_list/TV Shows $(date +\%Y-\%m-\%d-\%H-\%M).txt"
+echo "$(date "+%m-%d-%Y %T") : Created TV Series List" >> $LOGFILE 2>&1
+
+#Remove old Media lists
+find /boot/logs/media_list/ -mtime +2  -delete
+echo "$(date "+%m-%d-%Y %T") : Cleaned up media_list Folder (2 Days)" >> $LOGFILE 2>&1
+
+# #Display size of docker logs for runaway logging
+# du -ah /var/lib/docker/containers/ | grep -v "/$" | sort -rh | head -60 | grep .log
+# echo "$(date "+%m-%d-%Y %T") : Checked docker logs for runaway logging" >> $LOGFILE 2>&1
+
+#Check Qbittorrent IP
+IP="$(docker exec binhex-qbittorrentvpn curl -s http://ipinfo.io/ip)"
+echo "$(date "+%m-%d-%Y %T") : Qbittorrent IP is $IP" >> $LOGFILE 2>&1
+
+#Check current unRAID WAN IP
+IP2="$(curl -s http://ipinfo.io/ip)"
+echo "$(date "+%m-%d-%Y %T") : unRAID WAN IP is $IP2" >> $LOGFILE 2>&1
+
+#Final part of this script/calculates run time
+echo "$(date "+%m-%d-%Y %T") : Completed daily tasks in $(($(date +'%s') - $scriptstart)) SECONDS" | tee -a >> $LOGFILE 2>&1  
+/usr/local/emhttp/webGui/scripts/notify -s "$(date "+%m-%d-%Y %T") : Completed daily tasks in $(($(date +'%s') - $scriptstart)) SECONDS"
