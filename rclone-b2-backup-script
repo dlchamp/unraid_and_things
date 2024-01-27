@@ -15,16 +15,3 @@ sleep 1
 echo "Begin backup of /usb"
 rclone sync /mnt/disks/backup/usb/ b2:dlchamp-usb --transfers=4 --checkers=8 --fast-list --ignore-existing -P --buffer-size=100M --b2-chunk-size=500M --delete-excluded
 echo "All backups uploaded."
-
-
-
-
-
-
-
-
-
-
-
-
-
