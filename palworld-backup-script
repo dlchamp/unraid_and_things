@@ -13,7 +13,9 @@ backup_file_name="palworld_backup"
 
 # set number of backups you wish to keep
 # as a new backup is created beyond this number, the oldest backup will be deleted.
-max_backups_to_keep=2
+# I keep 5 because this script runs every 15 minutes.  The backups are relatively small
+# so 5 is not much data and might come in handy in the case of a corrupted save getting backed up.
+max_backups_to_keep=5  
 
 # ---------------------------------------------------------------------------------#
 start_time=$(date +%s)
