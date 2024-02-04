@@ -4,7 +4,7 @@ source_dir="/mnt/user/appdata/palworld/Pal/Saved"
 
 # set the destination directory/backup location
 # this directory must exist before you can run this backup.
-backup_dir="/mnt/disks/backup/games/palworld"
+backup_dir=""
 
 # and add a prefix to the file backup file name, date and time the backup
 # was started will be appended (ex: "Cloud_Backup-2024-01-16_09-55.tar.gz")
