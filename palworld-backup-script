@@ -30,7 +30,7 @@ if [ -z "$backup_file_name" ]; then
     backup_file_name=$(basename "$source_dir")
 fi
 
-# Check if backup destiation exists and is writable
+# Check if backup destination exists and is writable
 # Ensure backup directory exists and is writable
 if [ ! -d "$backup_dir" ] || [ ! -w "$backup_dir" ]; then
     echo "Backup directory does not exist or is not writable."
