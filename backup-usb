@@ -41,7 +41,7 @@ tar -czf "$backup_file" -C "$source_dir" .
 # Verify backup was successful
 if [ $? -ne 0 ]; then  
     echo "Backup failed. Exiting script."
-    /user/local/emhttp/webGui/scripts/notify -i warning -s "$backup_file_name backup failed. See log for details."
+    /usr/local/emhttp/webGui/scripts/notify -i warning -s "$backup_file_name backup failed. See log for details."
     exit 1
 fi
 
