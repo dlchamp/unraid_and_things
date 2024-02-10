@@ -6,7 +6,7 @@ plex_library_dir="/mnt/cache/appdata/plex/Library/Application Support/Plex Media
 backup_dir=""  
 
 # Set the max number of backups to keep.
-num_backups_to_keep=2
+num_backups_to_keep=3
 
 # --------------------------------------------------------------------------------------- #
 start_time=$(date +%s)
@@ -39,10 +39,11 @@ do
     fi
 done
 
-# Compress and backup Plex Databases
-echo "Compressing and backing up Plex Databases"
-tar -czf "$backup_dir/plex_backup_$now.tar.gz" -C "$plex_library_dir" "Plug-in Support/Databases/com.plexapp.plugins.library.db" "Plug-in Support/Databases/com.plexapp.plugins.library.blobs.db"
+# Compress and backup important plex data.
+echo "Compressing and backing up Plex Databases and directories/files"
+tar -czf "$backup_dir/plex_backup_$now.tar.gz" -C "$plex_library_dir" "Plug-in Support" "Plug-ins" "Preferences.xml"
 backup_status=$?
+
 # Start Plex once the compression and backup is complete
 echo "Backup is complete. Starting plex container."
 docker start plex
@@ -51,7 +52,7 @@ echo "Plex has been started."
 # Verify backup was successful
 if [ "$backup_status" -ne 0 ]; then  
     echo "Backup failed. Exiting script."
-    /user/local/emhttp/webGui/scripts/notify -i warning -s "Plex backup failed. See log for details."
+    /usr/local/emhttp/webGui/scripts/notify -i warning -s "Plex backup failed. See log for details."
     exit 1
 fi
 
