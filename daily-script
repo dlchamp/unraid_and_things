@@ -2,6 +2,7 @@
 scriptstart=$(date +'%s')
 LOGFILE="/boot/logs/Daily-Log.txt"
 
+
 docker restart binhex-qbittorrentvpn
 echo "$(date "+%m-%d-%Y %T") : Restarted Qbittorrent" >> $LOGFILE 2>&1
 
@@ -33,34 +34,34 @@ echo "$(date "+%m-%d-%Y %T") : Cleaned up dangling docker images" >> $LOGFILE 2>
 
 #Create/Cleanup Media lists for data recovery reasons
 # Verify destination exists, create if not
-mkdir -p "/boot/logs/media_list"
+mkdir -p "/mnt/disks/backup/media_list"
 
 #Movies
-find "/mnt/user/plex_media/Movies" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/boot/logs/media_list/Movies $(date +\%Y-\%m-\%d-\%H-\%M).txt"
+find "/mnt/user/plex_media/Movies" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/mnt/disks/backup/media_list/Movies $(date +\%Y-\%m-\%d-\%H-\%M).txt"
 echo "$(date "+%m-%d-%Y %T") : Created Movies List" >> $LOGFILE 2>&1
 
 #4K Movies
-find "/mnt/user/plex_media/UHD" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/boot/logs/media_list/UHD $(date +\%Y-\%m-\%d-\%H-\%M).txt"
+find "/mnt/user/plex_media/UHD" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/mnt/disks/backup/media_list/UHD $(date +\%Y-\%m-\%d-\%H-\%M).txt"
 echo "$(date "+%m-%d-%Y %T") : Created UHD List" >> $LOGFILE 2>&1
 
 #Comedy
-find "/mnt/user/plex_media/Comedy" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/boot/logs/media_list/Comedy $(date +\%Y-\%m-\%d-\%H-\%M).txt"
+find "/mnt/user/plex_media/Comedy" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/mnt/disks/backup/media_list/Comedy $(date +\%Y-\%m-\%d-\%H-\%M).txt"
 echo "$(date "+%m-%d-%Y %T") : Created Comedy List" >> $LOGFILE 2>&1
 
 #Documentaries
-find "/mnt/user/plex_media/Documentary" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/boot/logs/media_list/docs $(date +\%Y-\%m-\%d-\%H-\%M).txt"
+find "/mnt/user/plex_media/Documentary" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/mnt/disks/backup/media_list/docs $(date +\%Y-\%m-\%d-\%H-\%M).txt"
 echo "$(date "+%m-%d-%Y %T") : Created Docs List" >> $LOGFILE 2>&1
 
 #Kids
-find "/mnt/user/plex_media/Kids" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/boot/logs/media_list/Kids $(date +\%Y-\%m-\%d-\%H-\%M).txt"
+find "/mnt/user/plex_media/Kids" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/mnt/disks/backup/media_list/Kids $(date +\%Y-\%m-\%d-\%H-\%M).txt"
 echo "$(date "+%m-%d-%Y %T") : Created Kids List" >> $LOGFILE 2>&1
 
 #TVSeries
-find "/mnt/user/plex_media/TV Shows" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/boot/logs/media_list/TV Shows $(date +\%Y-\%m-\%d-\%H-\%M).txt"
+find "/mnt/user/plex_media/TV Shows" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' > "/mnt/disks/backup/media_list/TV Shows $(date +\%Y-\%m-\%d-\%H-\%M).txt"
 echo "$(date "+%m-%d-%Y %T") : Created TV Series List" >> $LOGFILE 2>&1
 
 #Remove old Media lists
-find /boot/logs/media_list/ -mtime +2  -delete
+find /mnt/disks/backup/media_list/ -mtime +2  -delete
 echo "$(date "+%m-%d-%Y %T") : Cleaned up media_list Folder (2 Days)" >> $LOGFILE 2>&1
 
 # #Display size of docker logs for runaway logging
