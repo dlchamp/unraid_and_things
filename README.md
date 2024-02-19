@@ -3,7 +3,7 @@ Mostly tailored for my specific usage, but you're more than welcome to alter and
 
 #### Backup Scripts
 - [general-share-backup-script](/general-share-backup-script) - Can be used to create a backup of any of your UnRAID shares or really any folders.  
-- [plex-backup-script](/plex-backup-script) - Used to backup the only two things that really matter from Plex.  `com.plexapp.plugins.library.db` and `com.plexapp.plugins.library.blobs.db` as these contain all data for watch history, users, libraries, structure, some text metadata, playlists, etc.  Just keeping these two databases has cut my backup size from over 300gb to just over 2 gb since I'm not also backuping up all the generated thumbnails, intro/credits, and posters.
+- [plex-backup-script](/plex-backup-script) - Backup the entirety of `Plug-ins` and `Plug-in Support`, which includes databases, preferences, configuration information (ignores metadata, cache, crash reports, etc.), and backs up `Preferences.xml` to maintain current server preferences and identification.
 - [rclone-b2-backup-script](/rclone-b2-backup-script) - A script that runs some rclone sync commands to backup my various backup folders from my external drive to my b2 buckets.  Runs every Sunday morning at 4am.
 - [backup-usb](/backup-usb) - Compress and backup the USB boot drive (similar to [general-share-backup](/general-share-backup-script), just with preset source of the boot directory)
 
